@@ -24,6 +24,10 @@ const COLLECTION_ADDRESS = {
 };
 
 exports.handler = async (event) => {
+  if (!SHIPLOGIC_API_KEY) {
+    console.error('shipping-rate: SHIPLOGIC_API_KEY environment variable is missing.');
+  }
+
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -52,8 +56,6 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ error: 'Delivery postal code (code) is required' }) };
   }
 
-  // Simple parcel sizing based on how many fans are in the cart.
-  // Each fan folded/boxed is roughly this size; weight scales with quantity, capped.
   const qty = Math.max(1, Math.min(Number(quantity) || 1, 5));
   const parcel = {
     submitted_length_cm: 65,
@@ -93,8 +95,6 @@ exports.handler = async (event) => {
       return { statusCode: response.status, headers, body: JSON.stringify({ error: 'Shiplogic API error', details: data }) };
     }
 
-    // Return the cheapest available rate plus the full list, so the frontend
-    // can show a default and (optionally) let the buyer pick a service level.
     const rates = (data.rates || []).sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
     const cheapest = rates[0] || null;
 
@@ -107,6 +107,7 @@ exports.handler = async (event) => {
       })
     };
   } catch (err) {
+    console.error('shipping-rate function error:', err);
     return { statusCode: 502, headers, body: JSON.stringify({ error: 'Failed to reach Shiplogic API', details: err.message }) };
   }
 };
