@@ -511,7 +511,8 @@
       const data = await res.json();
 
       if (!res.ok || !data.cheapest) {
-        resultEl.textContent = 'Could not get a quote for that address — please double-check the postal code.';
+        const detail = data && data.details && (data.details.message || (Array.isArray(data.details.errors) && data.details.errors[0]) || JSON.stringify(data.details).slice(0, 120));
+        resultEl.textContent = 'Could not get a quote for that address — please double-check the postal code.' + (detail ? ' (' + detail + ')' : '');
         resultEl.className = 'ship-result error';
         shippingCost = null;
       } else {
