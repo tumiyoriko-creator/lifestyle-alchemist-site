@@ -92,7 +92,12 @@ exports.handler = async (event) => {
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('shipping-rate: Shiplogic returned an error.', JSON.stringify(data));
       return { statusCode: response.status, headers, body: JSON.stringify({ error: 'Shiplogic API error', details: data }) };
+    }
+
+    if (!data.rates || data.rates.length === 0) {
+      console.error('shipping-rate: Shiplogic returned 200 OK but no rates.', JSON.stringify(data));
     }
 
     const rates = (data.rates || []).sort((a, b) => parseFloat(a.rate) - parseFloat(b.rate));
