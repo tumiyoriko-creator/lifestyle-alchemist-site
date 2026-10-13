@@ -52,12 +52,13 @@
   /* cart drawer */
   .cart-overlay {
     position:fixed; inset:0; background: rgba(28,27,25,0.35);
-    opacity:0; pointer-events:none; transition: opacity .35s ease; z-index: 90;
+    opacity:0; pointer-events:none; transition: opacity .35s ease; z-index: 1000;
   }
   .cart-overlay.open { opacity:1; pointer-events:auto; }
   .cart-drawer {
-    position:fixed; top:0; right:0; height:100%; width: min(400px, 92vw);
-    background: var(--cream); z-index: 95;
+    position:fixed; top:0; right:0; height:100%; height:100dvh; width: min(400px, 92vw);
+    overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+    background: var(--cream); z-index: 1001;
     transform: translateX(100%); transition: transform .4s cubic-bezier(.2,.8,.2,1);
     display:flex; flex-direction:column; box-shadow: -20px 0 50px rgba(28,27,25,0.15);
   }
@@ -65,7 +66,7 @@
   .cart-head { display:flex; align-items:center; justify-content:space-between; padding: 26px 28px; border-bottom: 1px solid var(--line); }
   .cart-head h3 { font-family: var(--display); font-weight:600; font-size: 22px; }
   .cart-close { background:none; border:none; cursor:pointer; font-size: 22px; line-height:1; color: var(--ink); }
-  .cart-list { flex:1; overflow-y:auto; padding: 10px 28px; }
+  .cart-list { flex:0 0 auto; padding: 10px 28px; }
   .cart-empty { color: var(--grey); font-size: 13.5px; padding: 30px 0; text-align:center; }
   .cart-row { display:flex; align-items:center; justify-content:space-between; padding: 18px 0; border-bottom: 1px solid var(--line); gap: 12px; }
   .cart-row-name { font-family: var(--display); font-weight:600; font-size: 16.5px; }
@@ -73,7 +74,7 @@
   .cart-row-qty { display:flex; align-items:center; gap: 10px; }
   .cart-row-qty button { width:24px; height:24px; border:1px solid var(--line); background: var(--cream); cursor:pointer; font-size: 14px; line-height:1; border-radius:50%; }
   .cart-row-qty span { font-size: 13px; min-width: 14px; text-align:center; }
-  .cart-foot { padding: 22px 28px 28px; border-top: 1px solid var(--line); }
+  .cart-foot { flex:1 0 auto; padding: 22px 28px 12px; border-top: 1px solid var(--line); }
   .cart-total-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom: 6px; }
   .cart-total-row .lbl { font-size: 13px; color: var(--grey); }
   .cart-total-row .amt { font-family: var(--display); font-weight:600; font-size: 24px; }
@@ -368,18 +369,20 @@
       <div class="ship-result" id="shipResult"></div>
     </div>
 
-    <div class="cart-total-row"><span class="lbl">Shipping</span><span class="amt" id="shipAmount">—</span></div>
-    <div class="cart-total-row cart-total-row--final"><span class="lbl">Total</span><span class="amt" id="grandTotal">R0.00</span></div>
-
+    <div class="cart-total-row"><span class="lbl">Shipping (standard)</span><span class="amt" id="shipAmount">—</span></div>
+  </div>
+  <div class="cart-pay">
+    <div class="cart-total-row cart-total-row--final"><span class="lbl">Total incl. shipping</span><span class="amt" id="grandTotal">R0.00</span></div>
     <div class="cart-note">You'll pay securely via PayFast — card, EFT, or Instant EFT.</div>
-    <button class="cart-checkout" id="cartCheckoutBtn" onclick="payWithPayFast()" disabled>PAY WITH PAYFAST <span class="arrow">→</span></button>
+    <button class="cart-checkout" id="cartCheckoutBtn" onclick="payWithPayFast()" disabled>CHECKOUT WITH PAYFAST <span class="arrow">→</span></button>
   </div>
 </div>
 
 <style>
   .ship-block{margin:16px 0;padding:16px;border:1px solid var(--line);border-radius:6px;background:rgba(0,0,0,0.015);}
-  .ship-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .ship-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;}
   .ship-fields input{
+    box-sizing:border-box;width:100%;min-width:0;
     grid-column:span 2;font-family:inherit;font-size:0.85rem;
     padding:9px 11px;border:1px solid var(--line);border-radius:4px;background:#fff;color:inherit;
   }
@@ -389,7 +392,11 @@
   .ship-result{margin-top:10px;font-size:0.82rem;min-height:1.2em;}
   .ship-result.error{color:#b23b3b;}
   .ship-result.ok{color:#2f7a4f;}
-  .cart-total-row--final{font-weight:700;border-top:1px solid var(--line);padding-top:10px;margin-top:4px;}
+  .cart-total-row--final{font-weight:700;margin-bottom:8px;}
+  .cart-total-row--final .lbl{color:var(--ink);font-weight:600;}
+  .cart-pay{position:sticky;bottom:0;flex-shrink:0;background:var(--cream);border-top:1px solid var(--line);
+    padding:14px 28px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(28,27,25,0.06);z-index:2;}
+  .cart-pay .cart-note{margin-bottom:12px;}
 </style>
 
 <script>
@@ -482,6 +489,7 @@
     if (!name || !phone || !email || !street || !city || !province || !code) {
       document.getElementById('shipResult').textContent = 'Please fill in your name, phone, email and full delivery address before paying.';
       document.getElementById('shipResult').className = 'ship-result error';
+      document.querySelector('.ship-block').scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
 
