@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /only-fans/thank-you/
+Disallow: /.netlify/
+
+Sitemap: https://lifestylealchemist.co.za/sitemap.xml
