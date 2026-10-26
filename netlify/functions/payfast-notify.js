@@ -99,7 +99,7 @@ exports.handler = async (event) => {
       </table>
       <p style="margin-top:20px;color:#555;">Delivering to: ${address || '—'}</p>
       <p style="color:#555;">Payment reference: ${pf_payment_id}</p>
-      <p style="margin-top:24px;color:#555;">We'll be in touch on WhatsApp to confirm collection or delivery details. Questions? Message us at
+      <p style="margin-top:24px;color:#555;">Your order and design are confirmed. We'll dispatch it within 1–3 business days via The Courier Guy. Questions? Message us at
         <a href="https://wa.me/27794998013" style="color:#c9995f;">wa.me/27794998013</a>.
       </p>
       <p style="color:#999;font-size:12px;margin-top:30px;">Lifestyle Alchemist — Pretoria, South Africa</p>
